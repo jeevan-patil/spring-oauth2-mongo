@@ -14,6 +14,13 @@ import org.springframework.web.servlet.mvc.WebContentInterceptor;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 
+/**
+ * 
+ * @author jeevan
+ * @date 03-Sep-2016 9:30:03 pm
+ * @purpose
+ *
+ */
 @Configuration
 @EnableWebMvc
 public class MvcConfiguration extends WebMvcConfigurerAdapter {
