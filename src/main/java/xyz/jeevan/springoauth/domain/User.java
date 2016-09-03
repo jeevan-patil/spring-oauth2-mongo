@@ -1,6 +1,10 @@
 package xyz.jeevan.springoauth.domain;
 
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
@@ -11,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 @Document(collection = "users")
 public class User extends BaseDomain {
+	@Indexed(unique = true)
 	private String username;
 	private String email;
 	private String name;
@@ -65,10 +70,12 @@ public class User extends BaseDomain {
 		this.avatar = avatar;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
