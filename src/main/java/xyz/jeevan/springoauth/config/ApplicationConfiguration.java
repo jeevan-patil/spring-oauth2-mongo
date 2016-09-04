@@ -10,11 +10,17 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.env.Environment;
 import org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
+import org.springframework.data.mongodb.core.convert.DbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -29,6 +35,8 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ReadPreference;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
+
+import xyz.jeevan.springoauth.converters.OAuthAuthenticationReadConverter;
 
 /**
  * 
@@ -67,7 +75,7 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 	public @Bean MongoTemplate mongoTemplate() throws Exception {
 		_log.info("Create mongodb template.");
 		MongoDbFactory mongoFactory = mongoDbFactory();
-		MongoTemplate mongoTemplate = new MongoTemplate(mongoFactory);
+		MongoTemplate mongoTemplate = new MongoTemplate(mongoFactory, mongoConverter());
 		mongoTemplate.setWriteConcern(WriteConcern.ACKNOWLEDGED);
 		mongoTemplate.setReadPreference(ReadPreference.primaryPreferred());
 		return mongoTemplate;
@@ -125,5 +133,22 @@ public class ApplicationConfiguration extends WebMvcConfigurerAdapter {
 				.allowedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization")
 				.exposedHeaders("Origin", "X-Requested-With", "Content-Type", "Accept", "Authorization")
 				.allowCredentials(false).maxAge(3600);
+	}
+
+	@Bean
+	public CustomConversions customConversions() {
+		List<Converter<?, ?>> converters = new ArrayList<Converter<?, ?>>();
+		converters.add(new OAuthAuthenticationReadConverter());
+		return new CustomConversions(converters);
+	}
+
+	@Bean
+	public MappingMongoConverter mongoConverter() throws Exception {
+		MongoMappingContext mappingContext = new MongoMappingContext();
+		DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDbFactory());
+		MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
+		mongoConverter.setCustomConversions(customConversions());
+		mongoConverter.afterPropertiesSet();
+		return mongoConverter;
 	}
 }

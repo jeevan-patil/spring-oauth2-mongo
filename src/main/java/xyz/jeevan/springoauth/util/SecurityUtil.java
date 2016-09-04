@@ -19,4 +19,8 @@ public class SecurityUtil {
 	public static String encode(final String pass) {
 		return (StringUtils.isEmpty(pass) ? null : encoder().encode(pass));
 	}
+
+	public static boolean passwordMatches(final String encrypted, final String raw) {
+		return encoder().matches(raw, encrypted);
+	}
 }

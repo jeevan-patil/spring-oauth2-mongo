@@ -38,7 +38,6 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		// Placeholder for incase we need this.
 		registry.addInterceptor(webContentInterceptor());
 	}
 

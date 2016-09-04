@@ -7,7 +7,10 @@ import javax.servlet.ServletRegistration;
 import org.springframework.web.WebApplicationInitializer;
 import org.springframework.web.context.ContextLoaderListener;
 import org.springframework.web.context.support.AnnotationConfigWebApplicationContext;
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.DispatcherServlet;
+
+import xyz.jeevan.springoauth.util.Endpoints;
 
 /**
  * 
@@ -32,6 +35,9 @@ public class WebAppInitializer implements WebApplicationInitializer {
 				new DispatcherServlet(rootContext));
 		dispatcher.setLoadOnStartup(1);
 		dispatcher.addMapping("/*");
+
+		servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy("springSecurityFilterChain"))
+				.addMappingForUrlPatterns(null, false, Endpoints.BASE_API_URL_V1 + "/*");
 	}
 
 }
